@@ -27,8 +27,11 @@
     });
   }
 
+  // When animations.js has GSAP running, it owns reveals and counters.
+  var gsapActive = !!window.__GSAP_ANIMS__;
+
   // Scroll reveal
-  var revealEls = document.querySelectorAll('.reveal');
+  var revealEls = gsapActive ? [] : document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && revealEls.length) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
@@ -44,7 +47,7 @@
   }
 
   // Animated counters
-  var counters = document.querySelectorAll('[data-count]');
+  var counters = gsapActive ? [] : document.querySelectorAll('[data-count]');
   if ('IntersectionObserver' in window && counters.length) {
     var cio = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {

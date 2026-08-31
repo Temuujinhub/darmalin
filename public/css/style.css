@@ -162,7 +162,16 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: auto;
   pointer-events: none;
+  z-index: 1;
 }
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+#hero-canvas canvas { width: 100%; height: 100%; display: block; }
+.hero .hero-inner { z-index: 2; }
 .hero-glow {
   position: absolute;
   width: 720px;
@@ -805,6 +814,11 @@ h2.section-title {
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
 }
+
+/* When GSAP drives the animations, disable the CSS-transition fallback
+   so the two systems don't fight over opacity/transform. */
+.has-gsap .reveal { opacity: 1; transform: none; transition: none; }
+.has-gsap { scroll-behavior: auto; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1024px) {
