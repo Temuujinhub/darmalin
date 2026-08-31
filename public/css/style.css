@@ -422,11 +422,26 @@ h2.section-title {
   align-items: center;
 }
 .split-feature .visual {
+  position: relative;
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow);
 }
 .split-feature .visual svg { width: 100%; height: auto; }
+
+/* Real photos overlay the SVG illustrations; if a photo fails to load
+   (onerror removes it) the illustration underneath remains visible. */
+.visual .photo,
+.news-media .photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+.news-media { position: relative; }
+.news-media .news-date { z-index: 2; }
 
 .checklist { list-style: none; margin-top: 26px; }
 .checklist li {
