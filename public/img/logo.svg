@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Dar Al Rimal monogram">
+  <defs>
+    <linearGradient id="lgGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d9b96a"/>
+      <stop offset="1" stop-color="#b0872f"/>
+    </linearGradient>
+    <linearGradient id="lgNavy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16305f"/>
+      <stop offset="1" stop-color="#081733"/>
+    </linearGradient>
+  </defs>
+  <!-- D letterform -->
+  <path d="M38 28 h44 c34 0 56 24 56 60 0 36 -22 60 -56 60 h-14 v-18 h14 c24 0 38 -17 38 -42 0 -25 -14 -42 -38 -42 h-26 v102 h-18 Z" fill="url(#lgNavy)"/>
+  <!-- R letterform -->
+  <path d="M84 62 h34 c20 0 33 11 33 29 0 13 -7 22 -18 26 l24 39 h-21 l-21 -36 h-13 v36 h-18 Z m18 16 v26 h15 c9 0 14 -5 14 -13 0 -8 -5 -13 -14 -13 Z" fill="url(#lgGold)"/>
+  <!-- dune sweep -->
+  <path d="M20 168 q45 -34 90 -18 q42 15 70 -6 q-20 34 -66 26 q-52 -9 -94 -2 Z" fill="url(#lgGold)"/>
+  <path d="M30 170 q50 -22 96 -12 q34 7 54 -6 q-16 22 -58 18 q-48 -5 -92 0 Z" fill="url(#lgNavy)" opacity="0.9"/>
+  <!-- globe -->
+  <circle cx="162" cy="42" r="20" fill="none" stroke="url(#lgGold)" stroke-width="4"/>
+  <ellipse cx="162" cy="42" rx="9" ry="20" fill="none" stroke="url(#lgGold)" stroke-width="3"/>
+  <path d="M143 36 h38 M143 49 h38" stroke="url(#lgGold)" stroke-width="3" fill="none"/>
+  <!-- orbit -->
+  <path d="M128 66 q34 12 52 -12" fill="none" stroke="url(#lgGold)" stroke-width="4" stroke-linecap="round"/>
+</svg>

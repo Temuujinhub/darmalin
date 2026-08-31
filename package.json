@@ -1,0 +1,13 @@
+{
+  "name": "darmalin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dar Al Rimal International Petroleum Trading LLC — corporate website (static site on Cloudflare Workers)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
