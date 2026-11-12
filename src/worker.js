@@ -5,13 +5,40 @@
 // both fetched server-side and cached at the edge.
 
 const SYMBOLS = [
-  { s: 'cb.f', key: 'brent',   name: 'Brent Crude',      unit: 'USD/bbl',   region: 'Europe · ICE' },
-  { s: 'cl.f', key: 'wti',     name: 'WTI Crude',        unit: 'USD/bbl',   region: 'Americas · NYMEX' },
-  { s: 'rb.f', key: 'gasoline',name: 'Gasoline (RBOB)',  unit: 'USD/gal',   region: 'Benchmark · RON 92/95' },
-  { s: 'ho.f', key: 'diesel',  name: 'Gasoil / ULSD',    unit: 'USD/gal',   region: 'Benchmark · EN590' },
-  { s: 'ng.f', key: 'natgas',  name: 'Natural Gas',      unit: 'USD/MMBtu', region: 'Americas · Henry Hub' },
+  { y: 'BZ=F', s: 'cb.f', key: 'brent',   name: 'Brent Crude',      unit: 'USD/bbl',   region: 'Europe · ICE' },
+  { y: 'CL=F', s: 'cl.f', key: 'wti',     name: 'WTI Crude',        unit: 'USD/bbl',   region: 'Americas · NYMEX' },
+  { y: 'RB=F', s: 'rb.f', key: 'gasoline',name: 'Gasoline (RBOB)',  unit: 'USD/gal',   region: 'Benchmark · RON 92/95' },
+  { y: 'HO=F', s: 'ho.f', key: 'diesel',  name: 'Gasoil / ULSD',    unit: 'USD/gal',   region: 'Benchmark · EN590' },
+  { y: 'NG=F', s: 'ng.f', key: 'natgas',  name: 'Natural Gas',      unit: 'USD/MMBtu', region: 'Americas · Henry Hub' },
 ];
 
+// Primary source: Yahoo Finance chart API (no key needed).
+async function fetchYahoo(symbol) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=5d&interval=1d`;
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0',
+      'Accept': 'application/json',
+    },
+    cf: { cacheTtl: 600, cacheEverything: true },
+  });
+  if (!res.ok) throw new Error('yahoo ' + res.status);
+  const j = await res.json();
+  const result = j && j.chart && j.chart.result && j.chart.result[0];
+  const meta = result && result.meta;
+  if (!meta || typeof meta.regularMarketPrice !== 'number') throw new Error('yahoo shape');
+  const price = meta.regularMarketPrice;
+  const prev = (typeof meta.chartPreviousClose === 'number' && meta.chartPreviousClose) ||
+               (typeof meta.previousClose === 'number' && meta.previousClose) || null;
+  return {
+    price: +price.toFixed(4),
+    date: new Date((meta.regularMarketTime || Date.now() / 1000) * 1000).toISOString().slice(0, 10),
+    change: prev ? +(price - prev).toFixed(4) : null,
+    changePct: prev ? +(((price - prev) / prev) * 100).toFixed(2) : null,
+  };
+}
+
+// Fallback source: stooq.com daily-history CSV.
 async function fetchHistory(symbol) {
   // Last ~14 days of daily closes -> last price + change vs previous close.
   const end = new Date();
@@ -44,15 +71,20 @@ async function prices() {
   const quotes = await Promise.all(
     SYMBOLS.map(async (sym) => {
       try {
-        const q = await fetchHistory(sym.s);
+        const q = await fetchYahoo(sym.y);
         return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, ...q };
-      } catch (e) {
-        return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, price: null };
+      } catch (e1) {
+        try {
+          const q = await fetchHistory(sym.s);
+          return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, ...q };
+        } catch (e2) {
+          return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, price: null };
+        }
       }
     })
   );
   return new Response(
-    JSON.stringify({ updated: new Date().toISOString(), source: 'stooq.com (delayed exchange data)', quotes }),
+    JSON.stringify({ updated: new Date().toISOString(), source: 'exchange data via Yahoo Finance / stooq (delayed)', quotes }),
     {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',

@@ -211,15 +211,35 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 62% 42%;
   z-index: 0;
+  animation: heroZoom 26s ease-in-out infinite alternate;
+  transform-origin: 62% 40%;
+}
+@keyframes heroZoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.09); }
 }
 .hero-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(100deg, rgba(6, 15, 31, 0.94) 0%, rgba(10, 25, 47, 0.82) 45%, rgba(10, 25, 47, 0.35) 100%);
+  background:
+    linear-gradient(180deg, rgba(6, 15, 31, 0.6) 0%, rgba(6, 15, 31, 0) 32%, rgba(6, 15, 31, 0) 62%, rgba(6, 15, 31, 0.78) 100%),
+    linear-gradient(100deg, rgba(6, 15, 31, 0.95) 0%, rgba(10, 25, 47, 0.84) 40%, rgba(10, 25, 47, 0.38) 74%, rgba(6, 15, 31, 0.5) 100%);
 }
 #hero-canvas { opacity: 0.55; z-index: 1; }
+#hero-dust {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg { animation: none; }
+}
 .hero p.lead {
   font-size: 19.5px;
   font-weight: 300;
