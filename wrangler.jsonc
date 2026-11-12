@@ -1,10 +1,13 @@
 {
-  // Cloudflare Workers configuration — serves the static site from ./public
+  // Cloudflare Workers configuration — static site from ./public plus
+  // a small Worker (src/worker.js) serving /api/prices market data.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "darmalin",
+  "main": "src/worker.js",
   "compatibility_date": "2025-08-01",
   "assets": {
     "directory": "./public",
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    "binding": "ASSETS"
   }
 }

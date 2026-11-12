@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Dar Al Rimal monogram">
   <defs>
     <linearGradient id="lgGold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#d9b96a"/>
-      <stop offset="1" stop-color="#b0872f"/>
+      <stop offset="0" stop-color="#d4b36e"/>
+      <stop offset="1" stop-color="#a98a44"/>
     </linearGradient>
     <linearGradient id="lgNavy" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#16305f"/>
-      <stop offset="1" stop-color="#081733"/>
+      <stop offset="0" stop-color="#112240"/>
+      <stop offset="1" stop-color="#060f1f"/>
     </linearGradient>
   </defs>
   <!-- D letterform -->
