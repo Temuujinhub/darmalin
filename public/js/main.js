@@ -56,19 +56,51 @@
         var el = e.target;
         var target = parseFloat(el.getAttribute('data-count'));
         var suffix = el.getAttribute('data-suffix') || '';
+        var pad = parseInt(el.getAttribute('data-pad') || '0', 10);
         var dur = 1600;
         var start = null;
         var step = function (ts) {
           if (!start) start = ts;
           var p = Math.min((ts - start) / dur, 1);
           var eased = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.round(target * eased) + suffix;
+          var v = String(Math.round(target * eased));
+          if (pad) v = v.padStart(pad, '0');
+          el.textContent = v + suffix;
           if (p < 1) requestAnimationFrame(step);
         };
         requestAnimationFrame(step);
       });
     }, { threshold: 0.4 });
     counters.forEach(function (el) { cio.observe(el); });
+  }
+
+  // DXB clock + desk status in the top bar
+  var clockEl = document.getElementById('dxb-clock');
+  var statusEl = document.getElementById('desk-status');
+  if (clockEl) {
+    var tick = function () {
+      try {
+        var now = new Date();
+        var time = new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Asia/Dubai', hour: '2-digit', minute: '2-digit', hour12: false
+        }).format(now);
+        clockEl.textContent = 'DXB ' + time + ' GMT+4';
+        if (statusEl) {
+          var parts = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Asia/Dubai', weekday: 'short', hour: 'numeric', hourCycle: 'h23'
+          }).formatToParts(now);
+          var wd = '', hr = 0;
+          parts.forEach(function (p) {
+            if (p.type === 'weekday') wd = p.value;
+            if (p.type === 'hour') hr = parseInt(p.value, 10);
+          });
+          var open = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].indexOf(wd) !== -1 && hr >= 9 && hr < 18;
+          statusEl.textContent = open ? 'ACTIVE' : 'ON CALL';
+        }
+      } catch (e) { /* older browsers: leave defaults */ }
+    };
+    tick();
+    setInterval(tick, 30000);
   }
 
   // Contact form -> mailto handoff (no backend required)

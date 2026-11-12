@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="img/logo.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,10 +17,15 @@
 <div class="topbar">
   <div class="container">
     <div class="topbar-contacts">
-      <a href="tel:+971523527887">☏ +971 52 352 7887</a>
-      <span>EMAAR Business Park, Building 4, Sheikh Zayed Rd, Dubai</span>
+      <span id="dxb-clock">DXB --:-- GMT+4</span>
+      <span class="sep-bar">|</span>
+      <span>Desk Status:&nbsp;<span class="desk-status" id="desk-status">ACTIVE</span></span>
     </div>
-    <div class="ar-name">دار الرمال العالمية لتجارة البترول ذ.م.م</div>
+    <div class="topbar-contacts">
+      <span class="lang">العربية / EN</span>
+      <span class="sep-bar">|</span>
+      <a href="tel:+971523527887">+971 52 352 7887</a>
+    </div>
   </div>
 </div>
 
@@ -35,13 +40,13 @@
       </span>
     </a>
     <nav class="main-nav" id="main-nav">
-      <a href="index.html" class="active">Home</a>
-      <a href="who-we-are.html">Who We Are</a>
-      <a href="what-we-do.html">What We Do</a>
+      <a href="who-we-are.html">About Us</a>
+      <a href="what-we-do.html">Products</a>
+      <a href="compliance.html">Compliance</a>
       <a href="sustainability.html">Sustainability</a>
       <a href="careers.html">Careers</a>
       <a href="media.html">Media</a>
-      <a href="contact.html" class="nav-cta">Contact Us</a>
+      <a href="contact.html" class="nav-cta">Contact Desk</a>
     </nav>
     <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="main-nav">
       <span></span><span></span><span></span>
@@ -51,32 +56,29 @@
 
 <!-- Hero -->
 <section class="hero" style="padding:0">
+  <img class="hero-bg" src="https://commons.wikimedia.org/wiki/Special:FilePath/MV%20Sirius%20Star%202009a.jpg?width=1920"
+       alt="" aria-hidden="true" onerror="this.remove()">
+  <div class="hero-overlay" aria-hidden="true"></div>
   <div id="hero-canvas" aria-hidden="true"></div>
-  <div class="hero-glow"></div>
   <div class="container hero-inner">
     <span class="eyebrow">Dubai · United Arab Emirates</span>
-    <h1>Energy that moves <em>the world</em>, traded with integrity.</h1>
+    <h1>Energy That Moves The World,<br><em>Traded With Integrity.</em></h1>
     <p class="lead">Dar Al Rimal International Petroleum Trading LLC connects producers, refiners and end-users across global markets — delivering crude oil, refined products and petrochemicals with reliability, transparency and speed.</p>
     <div class="hero-actions">
-      <a href="what-we-do.html" class="btn btn-gold">Explore What We Do <span class="arrow">→</span></a>
-      <a href="who-we-are.html" class="btn btn-outline-light">About the Company</a>
+      <a href="what-we-do.html" class="btn btn-outline-light">Explore Portfolio <span class="arrow">→</span></a>
+      <a href="files/DAR-AL-RIMAL-Corporate-Profile.pdf" class="btn btn-gold" download>Corporate Profile (PDF)</a>
     </div>
   </div>
-  <svg class="hero-dunes" viewBox="0 0 1440 180" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 120 Q 360 40 720 100 T 1440 80 V180 H0 Z" fill="#c19a3f" opacity="0.35"/>
-    <path d="M0 140 Q 420 70 820 125 T 1440 110 V180 H0 Z" fill="#c19a3f" opacity="0.55"/>
-    <path d="M0 160 Q 480 110 900 150 T 1440 140 V180 H0 Z" fill="#ffffff"/>
-  </svg>
 </section>
 
 <!-- Stats -->
 <div class="stats-band">
   <div class="container">
     <div class="stats-grid">
-      <div class="stat reveal"><span class="num" data-count="6" data-suffix="+">0</span><span class="label">Product Lines Traded</span></div>
-      <div class="stat reveal d1"><span class="num" data-count="3" data-suffix="">0</span><span class="label">Continents Served</span></div>
-      <div class="stat reveal d2"><span class="num" data-count="24" data-suffix="/7">0</span><span class="label">Trading Desk Coverage</span></div>
-      <div class="stat reveal d3"><span class="num" data-count="100" data-suffix="%">0</span><span class="label">Compliance Commitment</span></div>
+      <div class="stat reveal"><span class="num" data-count="6" data-pad="2">06</span><span class="label">Core Product Lines</span></div>
+      <div class="stat reveal d1"><span class="num" data-count="3" data-pad="2" data-suffix="+">03+</span><span class="label">Continents Served</span></div>
+      <div class="stat reveal d2"><span class="num">24/7</span><span class="label">Trading Coverage</span></div>
+      <div class="stat reveal d3"><span class="num" data-count="100" data-suffix="%">100%</span><span class="label">KYC &amp; Compliance</span></div>
     </div>
   </div>
 </div>
@@ -99,7 +101,7 @@
     </div>
     <div class="visual reveal d1">
       <img class="photo" loading="lazy" onerror="this.remove()"
-           src="https://commons.wikimedia.org/wiki/Special:FilePath/MV%20Sirius%20Star%202009a.jpg?width=1280"
+           src="https://commons.wikimedia.org/wiki/Special:FilePath/MV%20Sirius%20Star%202009b.jpg?width=1280"
            alt="Aerial view of a very large crude carrier at sea">
       <svg viewBox="0 0 640 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stylised illustration of a tanker at sunset in the Gulf">
         <defs>
@@ -144,39 +146,45 @@
     <div class="grid-3">
       <div class="card reveal">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#d9b96a" stroke-width="1.7"><path d="M12 2c4 5 6 8.5 6 12a6 6 0 1 1-12 0c0-3.5 2-7 6-12Z"/></svg></div>
+        <span class="card-num">01 /</span>
         <h3>Crude Oil</h3>
         <p>Sourcing and marketing of light, medium and heavy crude grades, matched to refiner demand across Asia, Africa and Europe.</p>
-        <a class="card-link" href="what-we-do.html#crude">Learn more →</a>
+        <a class="card-link" href="what-we-do.html#crude">View Specs →</a>
       </div>
       <div class="card reveal d1">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#d9b96a" stroke-width="1.7"><path d="M4 20V8l4-4h8l4 4v12H4Z"/><path d="M9 20v-6h6v6"/></svg></div>
+        <span class="card-num">02 /</span>
         <h3>Refined Products</h3>
         <p>Gasoline, gasoil/diesel, jet fuel and fuel oil traded on both spot and term structures, with quality assured at load and discharge.</p>
-        <a class="card-link" href="what-we-do.html#refined">Learn more →</a>
+        <a class="card-link" href="what-we-do.html#refined">View Specs →</a>
       </div>
       <div class="card reveal d2">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#d9b96a" stroke-width="1.7"><circle cx="7" cy="8" r="3.2"/><circle cx="16.5" cy="7" r="2.4"/><circle cx="12" cy="15.5" r="4"/></svg></div>
+        <span class="card-num">03 /</span>
         <h3>Petrochemicals</h3>
         <p>Feedstocks and intermediates — naphtha, aromatics and polymers — supplied to industrial buyers with dependable scheduling.</p>
-        <a class="card-link" href="what-we-do.html#petchem">Learn more →</a>
+        <a class="card-link" href="what-we-do.html#petchem">View Specs →</a>
       </div>
       <div class="card reveal">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#d9b96a" stroke-width="1.7"><rect x="4" y="9" width="16" height="10" rx="5"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg></div>
+        <span class="card-num">04 /</span>
         <h3>LPG &amp; Gas</h3>
         <p>Propane, butane and gas-derived products for utilities, distributors and industry, delivered safely and on schedule.</p>
-        <a class="card-link" href="what-we-do.html#lpg">Learn more →</a>
+        <a class="card-link" href="what-we-do.html#lpg">View Specs →</a>
       </div>
       <div class="card reveal d1">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#d9b96a" stroke-width="1.7"><path d="M3 18h18M5 18l2-8h10l2 8M9 10V6h6v4"/></svg></div>
+        <span class="card-num">05 /</span>
         <h3>Bitumen &amp; Asphalt</h3>
         <p>Paving and industrial bitumen grades supporting infrastructure growth across the Middle East, Africa and South Asia.</p>
-        <a class="card-link" href="what-we-do.html#bitumen">Learn more →</a>
+        <a class="card-link" href="what-we-do.html#bitumen">View Specs →</a>
       </div>
       <div class="card reveal d2">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#d9b96a" stroke-width="1.7"><path d="M7 3h10v4l-3 3v8a2 2 0 0 1-2 2h0a2 2 0 0 1-2-2v-8L7 7V3Z"/></svg></div>
+        <span class="card-num">06 /</span>
         <h3>Base Oils &amp; Lubricants</h3>
         <p>Group I–III base oils and finished lubricants sourced from leading refineries for blenders and distributors worldwide.</p>
-        <a class="card-link" href="what-we-do.html#baseoils">Learn more →</a>
+        <a class="card-link" href="what-we-do.html#baseoils">View Specs →</a>
       </div>
     </div>
   </div>
@@ -327,8 +335,9 @@
       <div>
         <h4>Company</h4>
         <ul class="footer-links">
-          <li><a href="who-we-are.html">Who We Are</a></li>
-          <li><a href="what-we-do.html">What We Do</a></li>
+          <li><a href="who-we-are.html">About Us</a></li>
+          <li><a href="what-we-do.html">Products &amp; Services</a></li>
+          <li><a href="compliance.html">Compliance</a></li>
           <li><a href="sustainability.html">Sustainability</a></li>
           <li><a href="careers.html">Careers</a></li>
           <li><a href="media.html">Media</a></li>
@@ -357,8 +366,7 @@
   <div class="footer-bottom">
     <div class="container">
       <span>© <span id="year">2026</span> Dar Al Rimal International Petroleum Trading LLC. All rights reserved.</span>
-      <span>Photography: Wikimedia Commons contributors (CC BY-SA) · U.S. Navy (public domain)</span>
-      <span>Dubai · United Arab Emirates</span>
+      <span>Dubai · United Arab Emirates · <a href="credits.html" style="color:inherit;text-decoration:underline">Credits</a></span>
     </div>
   </div>
 </footer>

@@ -53,18 +53,28 @@
   });
 
   // ---- Animated counters ----
+  // Markup already carries the final value, so a trigger that never fires
+  // can only leave the correct number in place.
   gsap.utils.toArray('[data-count]').forEach(function (el) {
     var target = parseFloat(el.getAttribute('data-count'));
     var suffix = el.getAttribute('data-suffix') || '';
+    var pad = parseInt(el.getAttribute('data-pad') || '0', 10);
     var obj = { v: 0 };
     gsap.to(obj, {
       v: target,
       duration: 1.8,
       ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-      onUpdate: function () { el.textContent = Math.round(obj.v) + suffix; }
+      scrollTrigger: { trigger: el, start: 'top 95%', once: true },
+      onUpdate: function () {
+        var v = String(Math.round(obj.v));
+        if (pad) v = v.padStart(pad, '0');
+        el.textContent = v + suffix;
+      }
     });
   });
+
+  // Recalculate trigger positions once everything (fonts, photos) has loaded
+  window.addEventListener('load', function () { ScrollTrigger.refresh(); });
 
   // ---- Gentle parallax on hero dunes and section visuals ----
   gsap.utils.toArray('.hero-dunes').forEach(function (el) {
