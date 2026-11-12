@@ -1,7 +1,8 @@
 // DAR AL RIMAL — Cloudflare Worker
-// Serves the static site from ./public and exposes /api/prices:
-// delayed exchange benchmark quotes fetched server-side from stooq.com
-// (free public CSV feed), cached at the edge for 10 minutes.
+// Serves the static site from ./public and exposes:
+//   /api/prices — delayed exchange benchmark quotes (stooq.com CSV),
+//   /api/ports  — current weather at key oil ports (Open-Meteo),
+// both fetched server-side and cached at the edge.
 
 const SYMBOLS = [
   { s: 'cb.f', key: 'brent',   name: 'Brent Crude',      unit: 'USD/bbl',   region: 'Europe · ICE' },
@@ -62,12 +63,63 @@ async function prices() {
   );
 }
 
+// Key ports for the Global Port Watch board. Order matters: the
+// Open-Meteo multi-location response comes back in the same order.
+const PORTS = [
+  { key: 'fujairah',  lat: 25.12, lon: 56.33 },
+  { key: 'jebelali',  lat: 25.01, lon: 55.06 },
+  { key: 'singapore', lat: 1.26,  lon: 103.84 },
+  { key: 'rotterdam', lat: 51.95, lon: 4.14 },
+  { key: 'houston',   lat: 29.73, lon: -95.27 },
+  { key: 'mumbai',    lat: 18.95, lon: 72.95 },
+];
+
+async function ports() {
+  const lats = PORTS.map((p) => p.lat).join(',');
+  const lons = PORTS.map((p) => p.lon).join(',');
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}` +
+    `&current=temperature_2m,wind_speed_10m,weather_code&wind_speed_unit=kn`;
+  const res = await fetch(url, { cf: { cacheTtl: 1800, cacheEverything: true } });
+  if (!res.ok) throw new Error('upstream ' + res.status);
+  const data = await res.json();
+  const list = Array.isArray(data) ? data : [data];
+  const out = {};
+  PORTS.forEach((p, i) => {
+    const cur = list[i] && list[i].current;
+    out[p.key] = cur ? {
+      temp: cur.temperature_2m,
+      windKn: cur.wind_speed_10m,
+      code: cur.weather_code,
+    } : null;
+  });
+  return new Response(
+    JSON.stringify({ updated: new Date().toISOString(), source: 'open-meteo.com', ports: out }),
+    {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=900',
+        'Access-Control-Allow-Origin': '*',
+      },
+    }
+  );
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/api/prices') {
       try {
         return await prices();
+      } catch (e) {
+        return new Response(JSON.stringify({ error: 'feed unavailable' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        });
+      }
+    }
+    if (url.pathname === '/api/ports') {
+      try {
+        return await ports();
       } catch (e) {
         return new Response(JSON.stringify({ error: 'feed unavailable' }), {
           status: 503,
