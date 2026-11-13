@@ -815,17 +815,45 @@ h2.section-title {
   letter-spacing: 0.04em;
 }
 .market-board {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1px;
-  background: var(--line);
+  background: var(--navy-deep);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
+  position: relative;
+}
+/* Fading edges hint that the ticker scrolls */
+.market-board::before,
+.market-board::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 46px;
+  z-index: 2;
+  pointer-events: none;
+}
+.market-board::before { left: 0; background: linear-gradient(90deg, var(--navy-deep), transparent); }
+.market-board::after { right: 0; background: linear-gradient(270deg, var(--navy-deep), transparent); }
+.mkt-track {
+  display: flex;
+  width: max-content;
+  animation: mktScroll 45s linear infinite;
+}
+.market-board:hover .mkt-track { animation-play-state: paused; }
+.mkt-track.static { animation: none; }
+@keyframes mktScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mkt-track { animation: none; }
+  .market-board { overflow-x: auto; }
 }
 .mkt-card {
   background: var(--navy-deep);
-  padding: 22px 20px;
+  padding: 22px 24px;
+  width: 232px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.09);
 }
 .mkt-name {
   color: var(--white);
@@ -862,7 +890,6 @@ h2.section-title {
 .mkt-chg.down { color: #ff6b6b; }
 .mkt-chg.flat { color: rgba(255, 255, 255, 0.55); }
 .mkt-offline {
-  grid-column: 1 / -1;
   background: var(--navy-deep);
   color: rgba(255, 255, 255, 0.75);
   padding: 26px 24px;
@@ -883,12 +910,6 @@ h2.section-title {
   font-size: 12.5px;
   color: var(--muted);
   max-width: 880px;
-}
-@media (max-width: 1024px) {
-  .market-board { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 640px) {
-  .market-board { grid-template-columns: 1fr; }
 }
 
 /* ---------- Port watch board ---------- */

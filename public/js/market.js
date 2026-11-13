@@ -14,22 +14,27 @@
     return q.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: q.price < 10 ? 4 : 2 });
   }
 
+  function cardHTML(q) {
+    var dir = q.changePct == null ? 'flat' : q.changePct >= 0 ? 'up' : 'down';
+    var arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '•';
+    var chg = q.changePct == null ? '' :
+      (q.change >= 0 ? '+' : '') + q.change.toFixed(2) + ' (' + (q.changePct >= 0 ? '+' : '') + q.changePct.toFixed(2) + '%)';
+    return '<div class="mkt-card">' +
+      '<div class="mkt-name">' + q.name + '</div>' +
+      '<div class="mkt-region">' + q.region + '</div>' +
+      '<div class="mkt-price">' + fmtPrice(q) + ' <span class="mkt-unit">' + q.unit + '</span></div>' +
+      '<div class="mkt-chg ' + dir + '">' + arrow + ' ' + (chg || 'n/a') + '</div>' +
+      '</div>';
+  }
+
   function render(data) {
-    board.innerHTML = '';
-    data.quotes.forEach(function (q) {
-      var dir = q.changePct == null ? 'flat' : q.changePct >= 0 ? 'up' : 'down';
-      var arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '•';
-      var chg = q.changePct == null ? '' :
-        (q.change >= 0 ? '+' : '') + q.change.toFixed(2) + ' (' + (q.changePct >= 0 ? '+' : '') + q.changePct.toFixed(2) + '%)';
-      var card = document.createElement('div');
-      card.className = 'mkt-card';
-      card.innerHTML =
-        '<div class="mkt-name">' + q.name + '</div>' +
-        '<div class="mkt-region">' + q.region + '</div>' +
-        '<div class="mkt-price">' + fmtPrice(q) + ' <span class="mkt-unit">' + q.unit + '</span></div>' +
-        '<div class="mkt-chg ' + dir + '">' + arrow + ' ' + (chg || 'n/a') + '</div>';
-      board.appendChild(card);
-    });
+    var quotes = data.quotes.filter(function (q) { return q.price != null; });
+    var strip = quotes.map(cardHTML).join('');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Duplicate the strip so the marquee loops seamlessly.
+    board.innerHTML = '<div class="mkt-track' + (reduced ? ' static' : '') + '">' + strip + strip + '</div>';
+    var track = board.firstChild;
+    track.style.animationDuration = (quotes.length * 4.5) + 's';
     if (updatedEl) {
       var d = new Date(data.updated);
       updatedEl.textContent = 'Updated ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' · delayed data';

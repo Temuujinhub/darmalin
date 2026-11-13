@@ -5,11 +5,16 @@
 // both fetched server-side and cached at the edge.
 
 const SYMBOLS = [
-  { y: 'BZ=F', s: 'cb.f', key: 'brent',   name: 'Brent Crude',      unit: 'USD/bbl',   region: 'Europe · ICE' },
-  { y: 'CL=F', s: 'cl.f', key: 'wti',     name: 'WTI Crude',        unit: 'USD/bbl',   region: 'Americas · NYMEX' },
-  { y: 'RB=F', s: 'rb.f', key: 'gasoline',name: 'Gasoline (RBOB)',  unit: 'USD/gal',   region: 'Benchmark · RON 92/95' },
-  { y: 'HO=F', s: 'ho.f', key: 'diesel',  name: 'Gasoil / ULSD',    unit: 'USD/gal',   region: 'Benchmark · EN590' },
-  { y: 'NG=F', s: 'ng.f', key: 'natgas',  name: 'Natural Gas',      unit: 'USD/MMBtu', region: 'Americas · Henry Hub' },
+  { y: 'BZ=F',     s: 'cb.f', key: 'brent',   name: 'Brent Crude',      unit: 'USD/bbl',   region: 'Europe · ICE' },
+  { y: 'CL=F',     s: 'cl.f', key: 'wti',     name: 'WTI Crude',        unit: 'USD/bbl',   region: 'Americas · NYMEX' },
+  { y: 'RB=F',     s: 'rb.f', key: 'gasoline',name: 'Gasoline (RBOB)',  unit: 'USD/gal',   region: 'Benchmark · RON 92/95' },
+  { y: 'HO=F',     s: 'ho.f', key: 'diesel',  name: 'Gasoil / ULSD',    unit: 'USD/gal',   region: 'Benchmark · EN590' },
+  { y: 'NG=F',     s: 'ng.f', key: 'natgas',  name: 'Natural Gas',      unit: 'USD/MMBtu', region: 'Americas · Henry Hub' },
+  { y: 'TTF=F',    s: null,   key: 'ttf',     name: 'Natural Gas (TTF)',unit: 'EUR/MWh',   region: 'Europe · ICE' },
+  { y: 'GC=F',     s: 'gc.f', key: 'gold',    name: 'Gold',             unit: 'USD/oz',    region: 'COMEX' },
+  { y: 'DX=F',     s: null,   key: 'dxy',     name: 'US Dollar Index',  unit: 'index',     region: 'ICE · DXY' },
+  { y: 'EURUSD=X', s: null,   key: 'eurusd',  name: 'EUR / USD',        unit: 'FX',        region: 'Currency' },
+  { y: 'USDJPY=X', s: null,   key: 'usdjpy',  name: 'USD / JPY',        unit: 'FX',        region: 'Currency' },
 ];
 
 // Primary source: Yahoo Finance chart API (no key needed).
@@ -74,6 +79,9 @@ async function prices() {
         const q = await fetchYahoo(sym.y);
         return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, ...q };
       } catch (e1) {
+        if (!sym.s) {
+          return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, price: null };
+        }
         try {
           const q = await fetchHistory(sym.s);
           return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, ...q };
