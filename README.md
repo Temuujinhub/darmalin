@@ -31,6 +31,18 @@ The Cloudflare Workers Builds integration (connected to this GitHub repo) deploy
 
 To serve the site on `dar-rimal.ae`, add the domain under **Workers & Pages → darmalin → Settings → Domains & Routes** in the Cloudflare dashboard.
 
+## Market data (`/api/prices`)
+
+`src/worker.js` assembles petroleum benchmarks by hub from three public sources; `src/parsers.js` validates every payload (instrument name, plausible range, internal consistency) and drops anything doubtful, so a card is only shown for a quote that passed its checks.
+
+| Source | Hubs | Needs |
+|---|---|---|
+| NYMEX / ICE futures via Yahoo Finance (stooq fallback) | North Sea, Cushing, New York Harbor, Mont Belvieu, Henry Hub, TTF, JKM | nothing |
+| Shanghai INE / SHFE, Dalian DCE via Sina Finance | Shanghai, Dalian | nothing |
+| U.S. port spot prices via EIA open data | US Gulf Coast, Los Angeles, New York Harbor | free API key |
+
+To enable the EIA cards, register a free key at https://www.eia.gov/opendata/register.php and add it to the Worker as a secret named `EIA_API_KEY` (Cloudflare dashboard → Workers & Pages → darmalin → Settings → Variables and Secrets), or run `npx wrangler secret put EIA_API_KEY`.
+
 ## Notes
 
 - Contact form has no backend: it opens the visitor's email client addressed to `info@dar-rimal.ae` (change in `public/js/main.js` and page footers if the address differs).

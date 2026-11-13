@@ -851,7 +851,7 @@ h2.section-title {
 .mkt-card {
   background: var(--navy-deep);
   padding: 22px 24px;
-  width: 232px;
+  width: 244px;
   flex-shrink: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.09);
 }
@@ -895,15 +895,12 @@ h2.section-title {
   padding: 26px 24px;
   font-size: 15px;
 }
-.fx-strip {
+.mkt-src {
   margin-top: 10px;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 12.5px;
-  color: var(--muted);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow-x: auto;
-  padding-bottom: 4px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
 }
 .market-note {
   margin-top: 12px;

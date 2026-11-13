@@ -1,29 +1,42 @@
 // DAR AL RIMAL — Live market watch
-// /api/prices (Cloudflare Worker -> stooq.com delayed exchange data)
-// + FX reference rates fetched directly from api.frankfurter.app (ECB).
-// Renders an exchange-style board; degrades to a quiet notice if feeds fail.
+// /api/prices (Cloudflare Worker) returns petroleum benchmarks by hub
+// from several public sources. Renders an auto-scrolling exchange-style
+// ticker; degrades to a quiet notice if the feed fails.
 
 (function () {
   var board = document.getElementById('market-board');
   if (!board) return;
   var updatedEl = document.getElementById('market-updated');
-  var fxEl = document.getElementById('fx-strip');
+  var sourcesEl = document.getElementById('market-sources');
 
   function fmtPrice(q) {
     if (q.price == null) return '—';
-    return q.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: q.price < 10 ? 4 : 2 });
+    var dp = q.price >= 1000 ? 0 : 2;
+    return q.price.toLocaleString('en-US', {
+      minimumFractionDigits: dp,
+      maximumFractionDigits: q.price < 10 ? 4 : dp
+    });
+  }
+
+  function fmtDate(iso) {
+    if (!iso || !/^\d{4}-\d{2}-\d{2}/.test(iso)) return '';
+    var d = new Date(iso.slice(0, 10) + 'T00:00:00Z');
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'UTC' });
   }
 
   function cardHTML(q) {
     var dir = q.changePct == null ? 'flat' : q.changePct >= 0 ? 'up' : 'down';
     var arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '•';
+    var dp = Math.abs(q.change || 0) >= 100 ? 0 : 2;
     var chg = q.changePct == null ? '' :
-      (q.change >= 0 ? '+' : '') + q.change.toFixed(2) + ' (' + (q.changePct >= 0 ? '+' : '') + q.changePct.toFixed(2) + '%)';
+      (q.change >= 0 ? '+' : '') + q.change.toFixed(dp) + ' (' + (q.changePct >= 0 ? '+' : '') + q.changePct.toFixed(2) + '%)';
+    var date = fmtDate(q.date);
     return '<div class="mkt-card">' +
       '<div class="mkt-name">' + q.name + '</div>' +
       '<div class="mkt-region">' + q.region + '</div>' +
       '<div class="mkt-price">' + fmtPrice(q) + ' <span class="mkt-unit">' + q.unit + '</span></div>' +
       '<div class="mkt-chg ' + dir + '">' + arrow + ' ' + (chg || 'n/a') + '</div>' +
+      '<div class="mkt-src">' + (q.source || '') + (date ? ' · ' + date : '') + '</div>' +
       '</div>';
   }
 
@@ -33,11 +46,13 @@
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Duplicate the strip so the marquee loops seamlessly.
     board.innerHTML = '<div class="mkt-track' + (reduced ? ' static' : '') + '">' + strip + strip + '</div>';
-    var track = board.firstChild;
-    track.style.animationDuration = (quotes.length * 4.5) + 's';
+    board.firstChild.style.animationDuration = (quotes.length * 4.5) + 's';
     if (updatedEl) {
       var d = new Date(data.updated);
       updatedEl.textContent = 'Updated ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' · delayed data';
+    }
+    if (sourcesEl && data.sources && data.sources.length) {
+      sourcesEl.textContent = 'Sources: ' + data.sources.join(' · ') + '.';
     }
   }
 
@@ -56,27 +71,6 @@
       .catch(renderError);
   }
 
-  function loadFx() {
-    if (!fxEl) return;
-    fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,CNY')
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        var r = d.rates || {};
-        var parts = [];
-        if (r.EUR) parts.push('EUR/USD ' + (1 / r.EUR).toFixed(4));
-        if (r.GBP) parts.push('GBP/USD ' + (1 / r.GBP).toFixed(4));
-        if (r.JPY) parts.push('USD/JPY ' + r.JPY.toFixed(2));
-        if (r.CNY) parts.push('USD/CNY ' + r.CNY.toFixed(4));
-        parts.push('USD/AED 3.6725 (pegged)');
-        fxEl.textContent = 'FX · ' + parts.join('   ·   ') + '   ·   ECB reference rates';
-      })
-      .catch(function () {
-        fxEl.textContent = 'FX · USD/AED 3.6725 (pegged)';
-      });
-  }
-
   load();
-  loadFx();
   setInterval(load, 5 * 60 * 1000);
-  setInterval(loadFx, 60 * 60 * 1000);
 })();

@@ -1,98 +1,143 @@
 // DAR AL RIMAL — Cloudflare Worker
 // Serves the static site from ./public and exposes:
-//   /api/prices — delayed exchange benchmark quotes (stooq.com CSV),
-//   /api/ports  — current weather at key oil ports (Open-Meteo),
-// both fetched server-side and cached at the edge.
+//   /api/prices — petroleum benchmarks by hub, from three public sources:
+//                 NYMEX/ICE futures (Yahoo Finance, stooq fallback),
+//                 Shanghai INE/SHFE + Dalian DCE (Sina Finance),
+//                 U.S. port spot prices (EIA open data, needs EIA_API_KEY)
+//   /api/ports  — current weather at key oil ports (Open-Meteo)
+// Everything is fetched server-side and cached at the edge.
 
-const SYMBOLS = [
-  { y: 'BZ=F',     s: 'cb.f', key: 'brent',   name: 'Brent Crude',      unit: 'USD/bbl',   region: 'Europe · ICE' },
-  { y: 'CL=F',     s: 'cl.f', key: 'wti',     name: 'WTI Crude',        unit: 'USD/bbl',   region: 'Americas · NYMEX' },
-  { y: 'RB=F',     s: 'rb.f', key: 'gasoline',name: 'Gasoline (RBOB)',  unit: 'USD/gal',   region: 'Benchmark · RON 92/95' },
-  { y: 'HO=F',     s: 'ho.f', key: 'diesel',  name: 'Gasoil / ULSD',    unit: 'USD/gal',   region: 'Benchmark · EN590' },
-  { y: 'NG=F',     s: 'ng.f', key: 'natgas',  name: 'Natural Gas',      unit: 'USD/MMBtu', region: 'Americas · Henry Hub' },
-  { y: 'TTF=F',    s: null,   key: 'ttf',     name: 'Natural Gas (TTF)',unit: 'EUR/MWh',   region: 'Europe · ICE' },
-  { y: 'GC=F',     s: 'gc.f', key: 'gold',    name: 'Gold',             unit: 'USD/oz',    region: 'COMEX' },
-  { y: 'DX=F',     s: null,   key: 'dxy',     name: 'US Dollar Index',  unit: 'index',     region: 'ICE · DXY' },
-  { y: 'EURUSD=X', s: null,   key: 'eurusd',  name: 'EUR / USD',        unit: 'FX',        region: 'Currency' },
-  { y: 'USDJPY=X', s: null,   key: 'usdjpy',  name: 'USD / JPY',        unit: 'FX',        region: 'Currency' },
+import { parseYahooChart, parseStooqCsv, parseSina, parseEia } from './parsers.js';
+
+// ---- NYMEX / ICE futures via Yahoo Finance ----
+// strict: instrument name must be present and match (unproven symbols).
+const YAHOO = [
+  { y: 'BZ=F',  s: 'cb.f', key: 'brent',     name: 'Brent Crude',      unit: 'USD/bbl',   region: 'North Sea · Europe',     source: 'ICE / NYMEX', expect: /brent/i,              min: 5,   max: 400 },
+  { y: 'CL=F',  s: 'cl.f', key: 'wti',       name: 'WTI Crude',        unit: 'USD/bbl',   region: 'Cushing, Oklahoma',      source: 'NYMEX',       expect: /crude/i,              min: 5,   max: 400 },
+  { y: 'HCL=F', s: null,   key: 'wti_hou',   name: 'WTI Houston',      unit: 'USD/bbl',   region: 'Houston, Texas',         source: 'NYMEX',       expect: /houston/i, strict: true, min: 5, max: 400 },
+  { y: 'RB=F',  s: 'rb.f', key: 'rbob',      name: 'Gasoline RBOB',    unit: 'USD/gal',   region: 'New York Harbor',        source: 'NYMEX',       expect: /gasoline|rbob/i,      min: 0.2, max: 12 },
+  { y: 'HO=F',  s: 'ho.f', key: 'ulsd',      name: 'Diesel ULSD',      unit: 'USD/gal',   region: 'New York Harbor',        source: 'NYMEX',       expect: /heating oil|ulsd/i,   min: 0.2, max: 12 },
+  { y: 'B0=F',  s: null,   key: 'propane',   name: 'Propane (LPG)',    unit: 'USD/gal',   region: 'Mont Belvieu, Texas',    source: 'NYMEX · OPIS',expect: /propane/i, strict: true, min: 0.05, max: 6 },
+  { y: 'NG=F',  s: 'ng.f', key: 'natgas',    name: 'Natural Gas',      unit: 'USD/MMBtu', region: 'Henry Hub, Louisiana',   source: 'NYMEX',       expect: /natural gas/i,        min: 0.5, max: 60 },
+  { y: 'TTF=F', s: null,   key: 'ttf',       name: 'Natural Gas TTF',  unit: 'EUR/MWh',   region: 'Netherlands · Europe',   source: 'ICE Endex',   expect: /ttf/i, strict: true,  min: 2,   max: 500 },
+  { y: 'JKM=F', s: null,   key: 'jkm',       name: 'LNG (JKM)',        unit: 'USD/MMBtu', region: 'Japan / Korea',          source: 'NYMEX · Platts', expect: /jkm|lng/i, strict: true, min: 1, max: 120 },
 ];
 
-// Primary source: Yahoo Finance chart API (no key needed).
-async function fetchYahoo(symbol) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=5d&interval=1d`;
-  const res = await fetch(url, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0',
-      'Accept': 'application/json',
-    },
-    cf: { cacheTtl: 600, cacheEverything: true },
-  });
-  if (!res.ok) throw new Error('yahoo ' + res.status);
-  const j = await res.json();
-  const result = j && j.chart && j.chart.result && j.chart.result[0];
-  const meta = result && result.meta;
-  if (!meta || typeof meta.regularMarketPrice !== 'number') throw new Error('yahoo shape');
-  const price = meta.regularMarketPrice;
-  const prev = (typeof meta.chartPreviousClose === 'number' && meta.chartPreviousClose) ||
-               (typeof meta.previousClose === 'number' && meta.previousClose) || null;
-  return {
-    price: +price.toFixed(4),
-    date: new Date((meta.regularMarketTime || Date.now() / 1000) * 1000).toISOString().slice(0, 10),
-    change: prev ? +(price - prev).toFixed(4) : null,
-    changePct: prev ? +(((price - prev) / prev) * 100).toFixed(2) : null,
-  };
+// ---- Shanghai INE / SHFE and Dalian DCE via Sina Finance ----
+const SINA = [
+  { c: 'nf_SC0', key: 'ine_crude', name: 'Crude Oil (INE)',      unit: 'CNY/bbl', region: 'Shanghai · China', source: 'INE',  min: 150,  max: 1500 },
+  { c: 'nf_FU0', key: 'shfe_fo',   name: 'Fuel Oil 380',         unit: 'CNY/t',   region: 'Shanghai · China', source: 'SHFE', min: 1000, max: 9000 },
+  { c: 'nf_LU0', key: 'ine_lsfo',  name: 'Low-Sulphur Fuel Oil', unit: 'CNY/t',   region: 'Shanghai · China', source: 'INE',  min: 1500, max: 12000 },
+  { c: 'nf_BU0', key: 'shfe_bu',   name: 'Bitumen',              unit: 'CNY/t',   region: 'Shanghai · China', source: 'SHFE', min: 1500, max: 8000 },
+  { c: 'nf_PG0', key: 'dce_lpg',   name: 'LPG',                  unit: 'CNY/t',   region: 'Dalian · China',   source: 'DCE',  min: 2000, max: 10000 },
+];
+
+// ---- U.S. port spot prices via EIA open data (free key required) ----
+const EIA = [
+  { id: 'EER_EPMRU_PF4_RGC_DPG',    key: 'usgc_gas',  name: 'Gasoline Regular',  unit: 'USD/gal', region: 'US Gulf Coast',   source: 'EIA spot', min: 0.2, max: 12 },
+  { id: 'EER_EPD2DXL0_PF4_RGC_DPG', key: 'usgc_ulsd', name: 'Diesel ULSD',       unit: 'USD/gal', region: 'US Gulf Coast',   source: 'EIA spot', min: 0.2, max: 12 },
+  { id: 'EER_EPJK_PF4_RGC_DPG',     key: 'usgc_jet',  name: 'Jet Fuel',          unit: 'USD/gal', region: 'US Gulf Coast',   source: 'EIA spot', min: 0.2, max: 12 },
+  { id: 'EER_EPD2DC_PF4_Y05LA_DPG', key: 'la_carb',   name: 'Diesel CARB ULSD',  unit: 'USD/gal', region: 'Los Angeles',     source: 'EIA spot', min: 0.2, max: 12 },
+  { id: 'EER_EPMRR_PF4_Y05LA_DPG',  key: 'la_rbob',   name: 'Gasoline RBOB',     unit: 'USD/gal', region: 'Los Angeles',     source: 'EIA spot', min: 0.2, max: 12 },
+  { id: 'EER_EPD2F_PF4_Y35NY_DPG',  key: 'nyh_ho',    name: 'Heating Oil No. 2', unit: 'USD/gal', region: 'New York Harbor', source: 'EIA spot', min: 0.2, max: 12 },
+];
+
+const UA = 'Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0';
+
+function card(cfg, q) {
+  return { key: cfg.key, name: cfg.name, unit: cfg.unit, region: cfg.region, source: cfg.source, ...q };
 }
 
-// Fallback source: stooq.com daily-history CSV.
-async function fetchHistory(symbol) {
-  // Last ~14 days of daily closes -> last price + change vs previous close.
-  const end = new Date();
-  const start = new Date(end.getTime() - 14 * 86400 * 1000);
-  const fmt = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
-  const url = `https://stooq.com/q/d/l/?s=${symbol}&d1=${fmt(start)}&d2=${fmt(end)}&i=d`;
-  const res = await fetch(url, {
-    headers: { 'User-Agent': 'site-market-widget' },
-    cf: { cacheTtl: 600, cacheEverything: true },
-  });
-  if (!res.ok) throw new Error('upstream ' + res.status);
-  const text = await res.text();
-  const rows = text.trim().split('\n').slice(1) // drop header
-    .map((l) => l.split(','))
-    .filter((c) => c.length >= 5 && !isNaN(parseFloat(c[4])));
-  if (rows.length < 1) throw new Error('no data');
-  const last = rows[rows.length - 1];
-  const prev = rows.length > 1 ? rows[rows.length - 2] : null;
-  const close = parseFloat(last[4]);
-  const prevClose = prev ? parseFloat(prev[4]) : null;
-  return {
-    price: close,
-    date: last[0],
-    change: prevClose ? +(close - prevClose).toFixed(4) : null,
-    changePct: prevClose ? +(((close - prevClose) / prevClose) * 100).toFixed(2) : null,
-  };
+async function yahooQuote(cfg) {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(cfg.y)}?range=5d&interval=1d`;
+    const res = await fetch(url, {
+      headers: { 'User-Agent': UA, 'Accept': 'application/json' },
+      cf: { cacheTtl: 600, cacheEverything: true },
+    });
+    if (res.ok) {
+      const q = parseYahooChart(await res.json(), cfg);
+      if (q) return card(cfg, q);
+    }
+  } catch (e) { /* fall through to stooq */ }
+
+  if (!cfg.s) return null;
+  try {
+    const end = new Date();
+    const start = new Date(end.getTime() - 14 * 86400 * 1000);
+    const fmt = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
+    const res = await fetch(`https://stooq.com/q/d/l/?s=${cfg.s}&d1=${fmt(start)}&d2=${fmt(end)}&i=d`, {
+      headers: { 'User-Agent': UA },
+      cf: { cacheTtl: 600, cacheEverything: true },
+    });
+    if (!res.ok) return null;
+    const q = parseStooqCsv(await res.text());
+    if (!q || q.price < cfg.min || q.price > cfg.max) return null;
+    return card(cfg, q);
+  } catch (e) {
+    return null;
+  }
 }
 
-async function prices() {
-  const quotes = await Promise.all(
-    SYMBOLS.map(async (sym) => {
-      try {
-        const q = await fetchYahoo(sym.y);
-        return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, ...q };
-      } catch (e1) {
-        if (!sym.s) {
-          return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, price: null };
-        }
-        try {
-          const q = await fetchHistory(sym.s);
-          return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, ...q };
-        } catch (e2) {
-          return { key: sym.key, name: sym.name, unit: sym.unit, region: sym.region, price: null };
-        }
-      }
-    })
-  );
+async function sinaQuotes() {
+  try {
+    const res = await fetch('https://hq.sinajs.cn/list=' + SINA.map((c) => c.c).join(','), {
+      headers: { 'Referer': 'https://finance.sina.com.cn/', 'User-Agent': UA },
+      cf: { cacheTtl: 600, cacheEverything: true },
+    });
+    if (!res.ok) return [];
+    const parsed = parseSina(await res.text(), SINA);
+    return SINA.filter((c) => parsed[c.key]).map((c) => card(c, parsed[c.key]));
+  } catch (e) {
+    return [];
+  }
+}
+
+async function eiaQuotes(env) {
+  const apiKey = env && env.EIA_API_KEY;
+  if (!apiKey) return [];
+  try {
+    const facets = EIA.map((c) => 'facets[series][]=' + c.id).join('&');
+    const url = 'https://api.eia.gov/v2/petroleum/pri/spt/data/?api_key=' + encodeURIComponent(apiKey) +
+      '&frequency=daily&data[0]=value&' + facets +
+      '&sort[0][column]=period&sort[0][direction]=desc&offset=0&length=80';
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) return [];
+    const parsed = parseEia(await res.json(), EIA);
+    return EIA.filter((c) => parsed[c.key]).map((c) => card(c, parsed[c.key]));
+  } catch (e) {
+    return [];
+  }
+}
+
+async function prices(env) {
+  const [yahoo, sina, eia] = await Promise.all([
+    Promise.all(YAHOO.map(yahooQuote)).then((list) => list.filter(Boolean)),
+    sinaQuotes(),
+    eiaQuotes(env),
+  ]);
+
+  // Display order: crude by hub, then products by hub, then gas.
+  const byKey = {};
+  [...yahoo, ...sina, ...eia].forEach((q) => { byKey[q.key] = q; });
+  const ORDER = [
+    'brent', 'wti', 'wti_hou', 'ine_crude',
+    'rbob', 'ulsd', 'nyh_ho',
+    'usgc_gas', 'usgc_ulsd', 'usgc_jet',
+    'la_rbob', 'la_carb',
+    'shfe_fo', 'ine_lsfo', 'shfe_bu',
+    'propane', 'dce_lpg',
+    'natgas', 'ttf', 'jkm',
+  ];
+  const quotes = ORDER.map((k) => byKey[k]).filter(Boolean);
+
+  const sources = [];
+  if (yahoo.length) sources.push('NYMEX / ICE futures via Yahoo Finance');
+  if (sina.length) sources.push('Shanghai INE / SHFE and Dalian DCE via Sina Finance');
+  if (eia.length) sources.push('U.S. port spot prices via EIA');
+
   return new Response(
-    JSON.stringify({ updated: new Date().toISOString(), source: 'exchange data via Yahoo Finance / stooq (delayed)', quotes }),
+    JSON.stringify({ updated: new Date().toISOString(), sources, quotes }),
     {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -103,8 +148,9 @@ async function prices() {
   );
 }
 
-// Key ports for the Global Port Watch board. Order matters: the
-// Open-Meteo multi-location response comes back in the same order.
+// ---- Global Port Watch ----
+// Order matters: the Open-Meteo multi-location response comes back in
+// the same order.
 const PORTS = [
   { key: 'fujairah',  lat: 25.12, lon: 56.33 },
   { key: 'jebelali',  lat: 25.01, lon: 55.06 },
@@ -144,28 +190,21 @@ async function ports() {
   );
 }
 
+function unavailable() {
+  return new Response(JSON.stringify({ error: 'feed unavailable' }), {
+    status: 503,
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/api/prices') {
-      try {
-        return await prices();
-      } catch (e) {
-        return new Response(JSON.stringify({ error: 'feed unavailable' }), {
-          status: 503,
-          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-        });
-      }
+      try { return await prices(env); } catch (e) { return unavailable(); }
     }
     if (url.pathname === '/api/ports') {
-      try {
-        return await ports();
-      } catch (e) {
-        return new Response(JSON.stringify({ error: 'feed unavailable' }), {
-          status: 503,
-          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-        });
-      }
+      try { return await ports(); } catch (e) { return unavailable(); }
     }
     return env.ASSETS.fetch(request);
   },
