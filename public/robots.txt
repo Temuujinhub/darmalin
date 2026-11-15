@@ -1,0 +1,6 @@
+# dar-rimal.ae
+# Cloudflare prepends its managed rules (AI training crawlers) to this file.
+User-agent: *
+Allow: /
+
+Sitemap: https://dar-rimal.ae/sitemap.xml
