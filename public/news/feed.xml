@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dar Al Rimal: daily fuel market news</title>
+    <link>https://dar-rimal.ae/news/</link>
+    <atom:link href="https://dar-rimal.ae/news/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>A daily brief on crude oil, diesel and refined products: prices, supply and policy from official and primary sources.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 15 Nov 2026 07:56:51 GMT</lastBuildDate>
+    <image>
+      <url>https://dar-rimal.ae/img/logo-512.png</url>
+      <title>Dar Al Rimal: daily fuel market news</title>
+      <link>https://dar-rimal.ae/news/</link>
+    </image>
+    <item>
+      <title>GME Oman crude marker settles at $92.04 a barrel on 13 November, down on the week</title>
+      <link>https://dar-rimal.ae/news/2026-11-15-gme-oman-crude-marker-settles-at-92-04-a-barrel-on-13-novemb</link>
+      <guid isPermaLink="true">https://dar-rimal.ae/news/2026-11-15-gme-oman-crude-marker-settles-at-92-04-a-barrel-on-13-novemb</guid>
+      <pubDate>Sun, 15 Nov 2026 07:56:51 GMT</pubDate>
+      <category>Prices</category>
+      <description>The Gulf Mercantile Exchange&apos;s official Oman crude futures marker price stood at $92.04 a barrel on 13 November, down $2.54 from a week earlier.</description>
+    </item>
+  </channel>
+</rss>

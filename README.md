@@ -67,14 +67,34 @@ article that names and links the source, and commits to this repository:
 
 | File | What |
 |---|---|
-| `public/news/<date>-<slug>.html` | Article page, built from `templates/news-page.html` |
+| `content/news/<date>-<slug>.json` | Article data (text, images, source) — not served; used to rebuild pages |
+| `public/news/<date>-<slug>.html` | Article page, built from `templates/news-page.html`, served at `/news/<date>-<slug>` |
 | `public/news/img/` | 1–5 images per article (source images with credit, or a generated chart/graphic) |
-| `public/news/index.json` | Published articles (also used to avoid repeats) |
-| `public/news/index.html` | Archive of all market news |
-| `public/media.html` | The "Market news" block between `<!-- market-news:start -->` and `<!-- market-news:end -->` — do not edit by hand |
+| `public/news/index.json` | Published articles (also used to avoid repeats, and by the X bot) |
+| `public/news/index.html` | Archive of all market news (`/news/`) |
+| `public/news/feed.xml` | RSS feed of the latest 30 articles |
+| `public/sitemap.xml` | Sitemap of every page and article — regenerated on each publish |
+| `public/media.html`, `public/index.html` | The "Market news" block between `<!-- market-news:start -->` and `<!-- market-news:end -->` (6 and 3 latest) — do not edit by hand |
 
-Cloudflare Workers Builds deploys each push. If you change the site header or footer, update
-`templates/news-page.html` as well (it lives outside `public/`, so it is not served).
+Cloudflare Workers Builds deploys each push to `main`. If you change the site header, footer or head tags, update
+`templates/news-page.html` as well (it lives outside `public/`, so it is not served), then re-render every article
+without calling Claude: `node src/website/generate.js --site-dir ../darmalin --rebuild` (in the bot repository).
+
+The bot also posts each article on X once, with the article link as the source.
+
+## SEO
+
+- Every page has a unique title and description, a canonical URL, Open Graph/Twitter tags and favicons.
+  Internal links use clean URLs (`/what-we-do`, not `what-we-do.html`, which Cloudflare redirects with a 307).
+- Structured data (JSON-LD): `Organization` + `WebSite` on the home page, `BreadcrumbList` on inner pages,
+  `NewsArticle` on articles, `CollectionPage` on `/news/`.
+- `robots.txt` points to `sitemap.xml` (Cloudflare prepends its managed AI-crawler rules).
+- One-time setup outside the code:
+  1. [Google Search Console](https://search.google.com/search-console): add the `dar-rimal.ae` domain property
+     (verify with the DNS TXT record in Cloudflare), then submit `https://dar-rimal.ae/sitemap.xml`.
+  2. [Bing Webmaster Tools](https://www.bing.com/webmasters): import the site from Search Console.
+  3. Cloudflare → Caching → Configuration → **Crawler Hints** on (tells Bing/Yandex about changes via IndexNow).
+  4. Google Business Profile for the Dubai office (Maps and local results for "petroleum trading company Dubai").
 
 ## Notes
 
