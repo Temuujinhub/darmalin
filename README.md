@@ -57,6 +57,25 @@ Setup, once:
 
 After editing the script later: Deploy → Manage deployments → Edit → Version: New version (keeps the same URL).
 
+## Market news (`/news/`)
+
+The daily fuel market news on the Media page is published automatically by the bot in
+[Temuujinhub/twitter-tech-bot](https://github.com/Temuujinhub/twitter-tech-bot) (`src/website/`,
+workflow `.github/workflows/website-news.yml`). Once a day it picks an oil/fuel story from official and
+primary sources (government agencies, exchanges, state news agencies), has Claude write a short English
+article that names and links the source, and commits to this repository:
+
+| File | What |
+|---|---|
+| `public/news/<date>-<slug>.html` | Article page, built from `templates/news-page.html` |
+| `public/news/img/` | 1–5 images per article (source images with credit, or a generated chart/graphic) |
+| `public/news/index.json` | Published articles (also used to avoid repeats) |
+| `public/news/index.html` | Archive of all market news |
+| `public/media.html` | The "Market news" block between `<!-- market-news:start -->` and `<!-- market-news:end -->` — do not edit by hand |
+
+Cloudflare Workers Builds deploys each push. If you change the site header or footer, update
+`templates/news-page.html` as well (it lives outside `public/`, so it is not served).
+
 ## Notes
 
 - Contact form has no backend: it opens the visitor's email client addressed to `info@dar-rimal.ae` (change in `public/js/main.js` and page footers if the address differs).
