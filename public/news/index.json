@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "2026-11-15-gme-oman-crude-marker-settles-at-92-04-a-barrel-on-13-novemb",
+    "date": "2026-11-15",
+    "publishedAt": "2026-11-15T07:56:51.543Z",
+    "headline": "GME Oman crude marker settles at $92.04 a barrel on 13 November, down on the week",
+    "summary": "The Gulf Mercantile Exchange's official Oman crude futures marker price stood at $92.04 a barrel on 13 November, down $2.54 from a week earlier.",
+    "tag": "Prices",
+    "url": "/news/2026-11-15-gme-oman-crude-marker-settles-at-92-04-a-barrel-on-13-novemb.html",
+    "region": "GULF",
+    "sourceId": "gulf-gme-marker",
+    "source": {
+      "name": "Gulf Mercantile Exchange (GME)",
+      "url": "https://www.gulfmerc.com/?week=2026-W46",
+      "published": "2026-11-13"
+    },
+    "cardImage": "/news/img/2026-11-15-gme-oman-crude-marker-settles-at-92-04-a-barrel-on-13-novemb-chart.jpg",
+    "cardImageAlt": "Oman crude (GME OQD) marker, USD/bbl"
+  }
+]
