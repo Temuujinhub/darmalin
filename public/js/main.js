@@ -103,28 +103,20 @@
     setInterval(tick, 30000);
   }
 
-  // Contact form -> mailto handoff (no backend required)
-  var form = document.getElementById('contact-form');
-  if (form) {
-    form.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      var get = function (id) {
-        var f = document.getElementById(id);
-        return f ? f.value.trim() : '';
-      };
-      var subject = 'Enquiry — ' + (get('cf-subject') || 'General') + ' — ' + get('cf-name');
-      var body =
-        'Name: ' + get('cf-name') + '\n' +
-        'Company: ' + get('cf-company') + '\n' +
-        'Email: ' + get('cf-email') + '\n' +
-        'Phone: ' + get('cf-phone') + '\n\n' +
-        get('cf-message');
-      window.location.href =
-        'mailto:info@dar-rimal.ae?subject=' + encodeURIComponent(subject) +
-        '&body=' + encodeURIComponent(body);
-      var note = document.getElementById('cf-note');
-      if (note) note.hidden = false;
-    });
+  // Floating WhatsApp button (the desk number is on WhatsApp)
+  if (!document.querySelector('.wa-float')) {
+    var wa = document.createElement('a');
+    wa.className = 'wa-float';
+    wa.href = 'https://wa.me/971523527887';
+    wa.target = '_blank';
+    wa.rel = 'noopener';
+    wa.setAttribute('aria-label', 'Chat with the trade desk on WhatsApp');
+    wa.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.3l-4.5 1.2Z"/>' +
+      '<path d="M9 8.5c-.3 1 .3 2.6 1.8 4.1 1.5 1.5 3.1 2.1 4.1 1.8l.9-1.2-1.7-1-.8.7c-.6-.2-1.3-.8-1.9-1.6l.6-.9-1.1-1.7L9 8.5Z" fill="currentColor" stroke="none"/></svg>' +
+      '<span>WhatsApp</span>';
+    document.body.appendChild(wa);
   }
 
   // Footer year

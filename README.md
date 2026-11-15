@@ -43,6 +43,20 @@ To serve the site on `dar-rimal.ae`, add the domain under **Workers & Pages → 
 
 To enable the EIA cards, register a free key at https://www.eia.gov/opendata/register.php and add it to the Worker as a secret named `EIA_API_KEY` (Cloudflare dashboard → Workers & Pages → darmalin → Settings → Variables and Secrets), or run `npx wrangler secret put EIA_API_KEY`.
 
+## Request for Quotation (`/api/rfq`)
+
+`public/contact.html` is the RFQ form (product, order type, quantity and unit, Incoterms, destination, payment, company, buyer role, contact, email, phone/WhatsApp, optional LOI/spec upload, notes). The browser validates for quick feedback; `src/rfq.js` validates again on the server and is the authority. The option lists in the page and in `src/rfq.js` must match.
+
+The Worker forwards each valid request to a Google Apps Script web app that appends it to a Google Sheet, saves the attachment to Drive and emails `info@dar-rimal.ae`. The buyer sees "Thank you" only after the sheet confirms the row was written. If it was not (not configured yet, Google error, network), the buyer gets one-tap WhatsApp / email buttons with their request already written out, so no request is lost.
+
+Setup, once:
+
+1. Create a Google Sheet → Extensions → Apps Script. Paste the whole of `docs/rfq-google-apps-script.gs`, Save.
+2. Deploy → New deployment → Web app. Execute as: **Me**. Who has access: **Anyone**. Authorize, copy the Web app URL.
+3. Cloudflare → Workers & Pages → darmalin → Settings → **Runtime variables and secrets** → Add → Secret `RFQ_WEBHOOK_URL` = that URL → Deploy.
+
+After editing the script later: Deploy → Manage deployments → Edit → Version: New version (keeps the same URL).
+
 ## Notes
 
 - Contact form has no backend: it opens the visitor's email client addressed to `info@dar-rimal.ae` (change in `public/js/main.js` and page footers if the address differs).

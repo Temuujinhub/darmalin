@@ -8,6 +8,7 @@
 // Everything is fetched server-side and cached at the edge.
 
 import { parseYahooChart, parseStooqCsv, parseSina, parseEia } from './parsers.js';
+import { validateRfq, makeRef } from './rfq.js';
 
 // ---- NYMEX / ICE futures via Yahoo Finance ----
 // strict: instrument name must be present and match (unproven symbols).
@@ -190,6 +191,104 @@ async function ports() {
   );
 }
 
+// ---- RFQ intake ----
+// POST /api/rfq validates the request and forwards it to the Google Apps
+// Script web app named by the RFQ_WEBHOOK_URL secret, which appends a row
+// to the RFQ sheet. A request is only acknowledged once that write
+// succeeded; otherwise the browser offers WhatsApp / email hand-off.
+
+function json(body, status) {
+  return new Response(JSON.stringify(body), {
+    status: status || 200,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
+  });
+}
+
+// false = the domain resolves but cannot receive mail (or does not exist);
+// null = lookup inconclusive, in which case the address is not rejected.
+async function domainAcceptsMail(domain) {
+  const query = async (type) => {
+    const res = await fetch(
+      `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`,
+      { headers: { accept: 'application/dns-json' }, cf: { cacheTtl: 3600, cacheEverything: true } }
+    );
+    return res.ok ? res.json() : null;
+  };
+  try {
+    const mx = await query('MX');
+    if (mx && mx.Status === 3) return false; // NXDOMAIN
+    if (mx && Array.isArray(mx.Answer) && mx.Answer.some((a) => a.type === 15)) return true;
+    const a = await query('A');
+    if (a && Array.isArray(a.Answer) && a.Answer.some((x) => x.type === 1)) return true;
+    return mx && a ? false : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function handleRfq(request, env) {
+  if (request.method !== 'POST') return json({ ok: false, error: 'method' }, 405);
+
+  // Same-origin only.
+  const origin = request.headers.get('Origin');
+  if (origin) {
+    try {
+      if (new URL(origin).host !== new URL(request.url).host) return json({ ok: false, error: 'origin' }, 403);
+    } catch (e) {
+      return json({ ok: false, error: 'origin' }, 403);
+    }
+  }
+
+  const raw = await request.text();
+  if (raw.length > 8 * 1024 * 1024) return json({ ok: false, error: 'too_large' }, 413);
+  let body;
+  try { body = JSON.parse(raw); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400); }
+
+  // Bots: a filled honeypot or an instant submit is refused, never stored.
+  // It is refused openly rather than acknowledged, so that a real buyer
+  // caught by mistake is shown the WhatsApp / email hand-off instead of a
+  // false confirmation.
+  if ((body && body.hp) || !(body && body.elapsedMs >= 2500)) {
+    return json({ ok: false, error: 'rejected' }, 422);
+  }
+
+  const v = validateRfq(body);
+  if (v.ok && v.clean.emailDomain) {
+    const accepts = await domainAcceptsMail(v.clean.emailDomain);
+    if (accepts === false) {
+      v.ok = false;
+      v.errors.email = 'This email domain cannot receive mail. Please check the address.';
+    }
+  }
+  if (!v.ok) return json({ ok: false, error: 'validation', fields: v.errors }, 422);
+
+  if (!env || !env.RFQ_WEBHOOK_URL) return json({ ok: false, error: 'not_configured' }, 503);
+
+  const ref = makeRef(new Date(), crypto.getRandomValues(new Uint8Array(4)));
+  const record = {
+    ref,
+    receivedAt: new Date().toISOString(),
+    country: (request.cf && request.cf.country) || '',
+    ...v.clean,
+  };
+
+  try {
+    const res = await fetch(env.RFQ_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record),
+      redirect: 'follow',
+    });
+    let out = null;
+    try { out = JSON.parse(await res.text()); } catch (e) { out = null; }
+    if (!res.ok || !out || out.ok !== true) return json({ ok: false, error: 'upstream' }, 502);
+  } catch (e) {
+    return json({ ok: false, error: 'upstream' }, 502);
+  }
+
+  return json({ ok: true, ref });
+}
+
 function unavailable() {
   return new Response(JSON.stringify({ error: 'feed unavailable' }), {
     status: 503,
@@ -205,6 +304,9 @@ export default {
     }
     if (url.pathname === '/api/ports') {
       try { return await ports(); } catch (e) { return unavailable(); }
+    }
+    if (url.pathname === '/api/rfq') {
+      try { return await handleRfq(request, env); } catch (e) { return json({ ok: false, error: 'server' }, 500); }
     }
     return env.ASSETS.fetch(request);
   },
