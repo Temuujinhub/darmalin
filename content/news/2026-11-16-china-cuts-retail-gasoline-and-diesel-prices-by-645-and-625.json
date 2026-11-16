@@ -1,0 +1,52 @@
+{
+  "entry": {
+    "slug": "2026-11-16-china-cuts-retail-gasoline-and-diesel-prices-by-645-and-625",
+    "date": "2026-11-16",
+    "publishedAt": "2026-11-16T07:14:29.868Z",
+    "headline": "China cuts retail gasoline and diesel prices by 645 and 625 yuan a tonne from 12 November",
+    "summary": "China's NDRC is lowering domestic gasoline and diesel prices by 645 yuan and 625 yuan per tonne respectively, effective from 24:00 on 12 November.",
+    "tag": "Prices",
+    "url": "/news/2026-11-16-china-cuts-retail-gasoline-and-diesel-prices-by-645-and-625",
+    "region": "CN",
+    "sourceId": "cn-ndrc",
+    "source": {
+      "name": "National Development and Reform Commission of China (NDRC)",
+      "url": "https://www.ndrc.gov.cn/xwdt/xwfb/202611/t20261112_1408795.html",
+      "published": "2026-11-12"
+    },
+    "images": [
+      {
+        "src": "/news/img/2026-11-16-china-cuts-retail-gasoline-and-diesel-prices-by-645-and-625-card.jpg",
+        "width": 1200,
+        "height": 675,
+        "alt": "China cuts retail gasoline and diesel prices by 645 and 625 yuan a tonne from 12 November",
+        "caption": "",
+        "creditLabel": "Graphic:",
+        "creditName": "Dar Al Rimal",
+        "creditUrl": ""
+      }
+    ],
+    "cardImage": "/news/img/2026-11-16-china-cuts-retail-gasoline-and-diesel-prices-by-645-and-625-card.jpg",
+    "cardImageAlt": "China cuts retail gasoline and diesel prices by 645 and 625 yuan a tonne from 12 November",
+    "cardImageWidth": 1200,
+    "cardImageHeight": 675
+  },
+  "article": {
+    "headline": "China cuts retail gasoline and diesel prices by 645 and 625 yuan a tonne from 12 November",
+    "summary": "China's NDRC is lowering domestic gasoline and diesel prices by 645 yuan and 625 yuan per tonne respectively, effective from 24:00 on 12 November.",
+    "paragraphs": [
+      "China's National Development and Reform Commission (NDRC) has announced a reduction in domestic retail prices for refined oil products, taking effect from 24:00 on 12 November.",
+      "Under the adjustment, the prices of gasoline and diesel (standard grades) will be lowered by 645 yuan per tonne and 625 yuan per tonne respectively, according to the NDRC.",
+      "The NDRC said international crude oil prices have fluctuated and moved lower since the previous domestic price adjustment on 29 October. The average international price over the 10 working days before this adjustment was below the average for the 10 working days ahead of the previous one, which triggered the downward revision under China's pricing mechanism.",
+      "The commission called on PetroChina, Sinopec, CNOOC and other crude oil processing companies to organise the production and transport of refined products to keep the market steadily supplied, and to strictly implement state pricing policy.",
+      "Local authorities were instructed to step up market supervision and inspections and to take firm action against any failure to apply the state pricing policy, in order to maintain normal market order. The NDRC added that consumers can report pricing violations through the 12315 platform. The notice was accompanied by a list of maximum retail prices for gasoline and diesel by province, region, municipality and central city."
+    ],
+    "key_figures": [
+      "Gasoline (standard grade): cut of 645 yuan/tonne",
+      "Diesel (standard grade): cut of 625 yuan/tonne",
+      "Effective: 24:00 on 12 November 2026",
+      "Previous adjustment: 29 October"
+    ],
+    "tag": "Prices"
+  }
+}

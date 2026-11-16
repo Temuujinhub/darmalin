@@ -6,12 +6,20 @@
     <atom:link href="https://dar-rimal.ae/news/feed.xml" rel="self" type="application/rss+xml"/>
     <description>A daily brief on crude oil, diesel and refined products: prices, supply and policy from official and primary sources.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 15 Nov 2026 07:56:51 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 16 Nov 2026 07:14:29 GMT</lastBuildDate>
     <image>
       <url>https://dar-rimal.ae/img/logo-512.png</url>
       <title>Dar Al Rimal: daily fuel market news</title>
       <link>https://dar-rimal.ae/news/</link>
     </image>
+    <item>
+      <title>China cuts retail gasoline and diesel prices by 645 and 625 yuan a tonne from 12 November</title>
+      <link>https://dar-rimal.ae/news/2026-11-16-china-cuts-retail-gasoline-and-diesel-prices-by-645-and-625</link>
+      <guid isPermaLink="true">https://dar-rimal.ae/news/2026-11-16-china-cuts-retail-gasoline-and-diesel-prices-by-645-and-625</guid>
+      <pubDate>Mon, 16 Nov 2026 07:14:29 GMT</pubDate>
+      <category>Prices</category>
+      <description>China&apos;s NDRC is lowering domestic gasoline and diesel prices by 645 yuan and 625 yuan per tonne respectively, effective from 24:00 on 12 November.</description>
+    </item>
     <item>
       <title>GME Oman crude marker settles at $92.04 a barrel on 13 November, down on the week</title>
       <link>https://dar-rimal.ae/news/2026-11-15-gme-oman-crude-marker-settles-at-92-04-a-barrel-on-13-novemb</link>
