@@ -82,6 +82,22 @@ without calling Claude: `node src/website/generate.js --site-dir ../darmalin --r
 
 The bot also posts each article on X once, with the article link as the source.
 
+## On-time trigger for the news bot (Cron Trigger)
+
+GitHub's own `schedule:` runs for the bot are often hours late or skipped, so the Worker also has a
+Cloudflare Cron Trigger (`wrangler.jsonc` → `triggers.crons`, code in `src/scheduler.js`). Every 15 minutes
+from 09:00 to 17:45 Ulaanbaatar time it starts the X bot workflow in `Temuujinhub/twitter-tech-bot`
+(the bot decides itself whether a post is due), and at 11:30 and 14:30 it also starts the daily
+market news article (published at most once a day).
+
+One-time setup:
+1. GitHub → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate:
+   Repository access = *Only select repositories* → `twitter-tech-bot`; Permissions → **Actions: Read and write**.
+2. Cloudflare → Workers & Pages → `darmalin` → Settings → **Variables and Secrets** → Add →
+   Type **Secret**, name `GITHUB_DISPATCH_TOKEN`, value = that token.
+
+Without the secret the trigger does nothing (it logs a note). Logs: Workers & Pages → `darmalin` → Observability.
+
 ## SEO
 
 - Every page has a unique title and description, a canonical URL, Open Graph/Twitter tags and favicons.

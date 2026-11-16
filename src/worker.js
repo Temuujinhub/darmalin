@@ -5,10 +5,12 @@
 //                 Shanghai INE/SHFE + Dalian DCE (Sina Finance),
 //                 U.S. port spot prices (EIA open data, needs EIA_API_KEY)
 //   /api/ports  — current weather at key oil ports (Open-Meteo)
+// and, on a Cron Trigger, starts the news bot's GitHub workflows on time (src/scheduler.js).
 // Everything is fetched server-side and cached at the edge.
 
 import { parseYahooChart, parseStooqCsv, parseSina, parseEia } from './parsers.js';
 import { validateRfq, makeRef } from './rfq.js';
+import { runScheduled } from './scheduler.js';
 
 // ---- NYMEX / ICE futures via Yahoo Finance ----
 // strict: instrument name must be present and match (unproven symbols).
@@ -309,5 +311,10 @@ export default {
       try { return await handleRfq(request, env); } catch (e) { return json({ ok: false, error: 'server' }, 500); }
     }
     return env.ASSETS.fetch(request);
+  },
+
+  // Cron Trigger (wrangler.jsonc → triggers.crons): starts the news bot's GitHub workflows on time.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(runScheduled(event, env));
   },
 };
