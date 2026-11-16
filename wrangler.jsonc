@@ -5,6 +5,11 @@
   "name": "darmalin",
   "main": "src/worker.js",
   "compatibility_date": "2025-08-01",
+  // Every 15 minutes, 01:00–09:45 UTC (= 09:00–17:45 Ulaanbaatar): starts the news bot's GitHub
+  // workflows on time (src/scheduler.js). Needs the secret GITHUB_DISPATCH_TOKEN.
+  "triggers": {
+    "crons": ["*/15 1-9 * * *"]
+  },
   "assets": {
     "directory": "./public",
     "not_found_handling": "404-page",
