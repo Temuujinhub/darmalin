@@ -1,5 +1,25 @@
 [
   {
+    "slug": "2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb",
+    "date": "2026-11-18",
+    "publishedAt": "2026-11-18T03:30:26.815Z",
+    "headline": "GME Oman crude marker settles at $88.61 a barrel on 17 November",
+    "summary": "The Gulf Mercantile Exchange's official Oman crude futures marker price was $88.61 a barrel on 17 November 2026, up $0.31 from five sessions earlier.",
+    "tag": "Prices",
+    "url": "/news/2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb",
+    "region": "GULF",
+    "sourceId": "gulf-gme-marker",
+    "source": {
+      "name": "Gulf Mercantile Exchange (GME)",
+      "url": "https://www.gulfmerc.com/?week=2026-W47",
+      "published": "2026-11-17"
+    },
+    "cardImage": "/news/img/2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb-chart.jpg",
+    "cardImageAlt": "Oman crude (GME OQD) marker, USD/bbl",
+    "cardImageWidth": 1200,
+    "cardImageHeight": 675
+  },
+  {
     "slug": "2026-11-17-mongolia-commissions-3-000-cubic-metre-fuel-storage-depot-bu",
     "date": "2026-11-17",
     "publishedAt": "2026-11-17T03:30:28.273Z",

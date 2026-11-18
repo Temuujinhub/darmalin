@@ -1,0 +1,51 @@
+{
+  "entry": {
+    "slug": "2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb",
+    "date": "2026-11-18",
+    "publishedAt": "2026-11-18T03:30:26.815Z",
+    "headline": "GME Oman crude marker settles at $88.61 a barrel on 17 November",
+    "summary": "The Gulf Mercantile Exchange's official Oman crude futures marker price was $88.61 a barrel on 17 November 2026, up $0.31 from five sessions earlier.",
+    "tag": "Prices",
+    "url": "/news/2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb",
+    "region": "GULF",
+    "sourceId": "gulf-gme-marker",
+    "source": {
+      "name": "Gulf Mercantile Exchange (GME)",
+      "url": "https://www.gulfmerc.com/?week=2026-W47",
+      "published": "2026-11-17"
+    },
+    "images": [
+      {
+        "src": "/news/img/2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb-chart.jpg",
+        "width": 1200,
+        "height": 675,
+        "alt": "Oman crude (GME OQD) marker, USD/bbl",
+        "caption": "Oman crude (GME OQD) marker, USD/bbl",
+        "creditLabel": "Chart:",
+        "creditName": "Dar Al Rimal",
+        "creditUrl": ""
+      }
+    ],
+    "cardImage": "/news/img/2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb-chart.jpg",
+    "cardImageAlt": "Oman crude (GME OQD) marker, USD/bbl",
+    "cardImageWidth": 1200,
+    "cardImageHeight": 675
+  },
+  "article": {
+    "headline": "GME Oman crude marker settles at $88.61 a barrel on 17 November",
+    "summary": "The Gulf Mercantile Exchange's official Oman crude futures marker price was $88.61 a barrel on 17 November 2026, up $0.31 from five sessions earlier.",
+    "paragraphs": [
+      "The official Daily Marker Price for Oman crude futures (OQD) on the Gulf Mercantile Exchange (GME) was $88.61 a barrel on 17 November 2026, according to the Dubai-based exchange, formerly known as the Dubai Mercantile Exchange.",
+      "Over five trading sessions the marker was little changed. It rose $0.31 from its 10 November level, when it had fallen to $88.30/bbl. During the week the price recovered steadily over four consecutive sessions, then dropped back on 17 November and gave up most of those gains.",
+      "Across the 30 trading sessions since 7 October, the marker traded in a wide range. It peaked at $116.77 a barrel on 23 October, and its low for the period was the 10 November settlement. The price was still above $100/bbl at the start of November but declined sharply over the following days, so the latest level sits near the bottom of the period's range.",
+      "GME publishes the Daily Marker Price as the official daily reference for its Oman crude futures contract, quoted in US dollars per barrel."
+    ],
+    "key_figures": [
+      "Oman crude (GME OQD) marker: $88.61/bbl, 17 November 2026",
+      "Change over 5 sessions: +$0.31 (0.4%) from $88.30/bbl on 10 November",
+      "30-session high: $116.77/bbl on 23 October",
+      "30-session low: $88.30/bbl on 10 November"
+    ],
+    "tag": "Prices"
+  }
+}

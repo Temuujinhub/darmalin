@@ -6,12 +6,20 @@
     <atom:link href="https://dar-rimal.ae/news/feed.xml" rel="self" type="application/rss+xml"/>
     <description>A daily brief on crude oil, diesel and refined products: prices, supply and policy from official and primary sources.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 17 Nov 2026 03:30:28 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 18 Nov 2026 03:30:26 GMT</lastBuildDate>
     <image>
       <url>https://dar-rimal.ae/img/logo-512.png</url>
       <title>Dar Al Rimal: daily fuel market news</title>
       <link>https://dar-rimal.ae/news/</link>
     </image>
+    <item>
+      <title>GME Oman crude marker settles at $88.61 a barrel on 17 November</title>
+      <link>https://dar-rimal.ae/news/2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb</link>
+      <guid isPermaLink="true">https://dar-rimal.ae/news/2026-11-18-gme-oman-crude-marker-settles-at-88-61-a-barrel-on-17-novemb</guid>
+      <pubDate>Wed, 18 Nov 2026 03:30:26 GMT</pubDate>
+      <category>Prices</category>
+      <description>The Gulf Mercantile Exchange&apos;s official Oman crude futures marker price was $88.61 a barrel on 17 November 2026, up $0.31 from five sessions earlier.</description>
+    </item>
     <item>
       <title>Mongolia commissions 3,000 cubic metre fuel storage depot built by Mort Gobi Oil</title>
       <link>https://dar-rimal.ae/news/2026-11-17-mongolia-commissions-3-000-cubic-metre-fuel-storage-depot-bu</link>
